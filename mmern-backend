@@ -1,0 +1,44 @@
+const express = require("express");
+const cors = require("cors");
+require("./db");
+const User = require("./User");
+
+const app = express();
+app.use(cors());
+
+app.use(express.json());
+
+// GET - Read all users
+app.get("/users", async (req, res) => {
+  const users = await User.find();
+  res.json(users);
+});
+
+// POST - Create a new user
+app.post("/users", async (req, res) => {
+  const newUser = new User(req.body);
+  await newUser.save();
+  res.json(newUser);
+});
+
+// PUT - Update a user
+app.put("/users/:id", async (req, res) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+
+  res.json(updatedUser);
+});
+
+// DELETE - Delete a user
+app.delete("/users/:id", async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json({ message: "User deleted" });
+});
+
+// Start server
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
+});
